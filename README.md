@@ -11,7 +11,7 @@ Module has two classes:
 To use functions and classes from this module, install it with command
 
 ```bash
-pip3 install foliatncontrib.utils.combinedoptions
+pip3 install foliantcontrib.utils.combinedoptions
 ```
 
 Then in your preprocessor module import the Options or CombinedOptions class and wrap your options dictionaries in them:
