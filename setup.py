@@ -12,14 +12,14 @@ except FileNotFoundError:
 
 
 setup(
-    name='foliantcontrib.utils.combinedoptions',
+    name='foliantcontrib.utils.combined_options',
     description=SHORT_DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     long_description_content_type='text/markdown',
     version='1.0.0',
     author='Daniil Minukhin',
     author_email='ddddsa@gmail.com',
-    url='https://github.com/foliant-docs/foliantcontrib.utils.combinedoptions',
+    url='https://github.com/foliant-docs/foliantcontrib.utils.combined_options',
     packages=['foliant.preprocessors.utils'],
     license='MIT',
     platforms='any',

@@ -1,6 +1,6 @@
 # Overview
 
-CombinedOptions is a module which helps you cope with the options from foliant.yml and tag options.
+combined_options is a module which helps you cope with the options from foliant.yml and tag options.
 
 Module has two classes:
 - **Options** which extends functionality of an options dictionary,
