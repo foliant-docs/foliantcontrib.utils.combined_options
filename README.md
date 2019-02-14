@@ -14,6 +14,22 @@ To use functions and classes from this module, install it with command
 pip3 install foliatncontrib.utils.combinedoptions
 ```
 
+Then in your preprocessor module import the Options or CombinedOptions class and wrap your options dictionaries in them:
+
+```python
+from foliant.preprocessors.utils.combined_options import CombinedOptions
+
+...
+
+options = CombinedOptions({'main': main_options,
+                           'tag': tag_options},
+                          priority='tag')
+if 'caption' in options:
+    self._caption = options['caption']
+```
+
+Options and CombinedOptions act like a dictionary. For detailed description of the functions, please refer to the rest of the documentation.
+
 ## Options class
 
 Options class wraps around the options dictionary, for example from your foliant.yaml file, and gives it some extra functionality.
