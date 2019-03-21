@@ -190,3 +190,26 @@ def yaml_to_dict_convertor(option: str or dict):
         return option
     elif type(option) is str:
         return yaml.load(option)
+
+
+def boolean_convertor(option):
+    '''
+    convert option to bool if necessary.
+
+    Accepts True\False, 'tRuE' \ 'falSE', 1\0, Y \ n, yes \ no
+    "other str" = True
+    '''
+    str_dict = {
+        'y': True,
+        'n': False,
+        'yes': True,
+        'no': False,
+        'true': True,
+        'false': False
+    }
+    if type(option) == bool:
+        return option
+    elif type(option) == int:
+        return bool(int)
+    elif type(option) == str:
+        return str_dict.get(option.lower().strip(), True)
