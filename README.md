@@ -239,7 +239,7 @@ To use this validator, first get one from the factory, supplying the list of cor
 >>> options = Options({'dish': 'chicken'}, convertors={'dish': validator})
 Traceback (most recent call last):
   ...
-foliant.preprocessors.utils.combined_options.ValidationError: Unsupported option value chicken. Should be oneof: ['spam', 'eggs', 'bacon']
+foliant.preprocessors.utils.combined_options.ValidationError: Unsupported option value chicken. Should be one of: ['spam', 'eggs', 'bacon']
 
 ```
 
