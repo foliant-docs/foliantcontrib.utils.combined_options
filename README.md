@@ -139,9 +139,9 @@ foliant.preprocessors.utils.combined_options.ValidationError: Error in option "c
 
 You see, it even didn't allow us to create an options object because the value of the parameter is wrong. You should handle this error on your own.
 
-**Converters**
+**Convertors**
 
-Sometimes you have to convert the value of the option that user provided before using it. Converters are functions that are applied to certain options and replace their value in the Options object with the converted result of this function.
+Sometimes you have to convert the value of the option that user provided before using it. Convertors are functions that are applied to certain options and replace their value in the Options object with the converted result of this function.
 
 For example, if we need a comma-separated string has to be converted into a list, we can write this kind of convertor:
 
@@ -221,3 +221,44 @@ You can also change the priority on fly. To do this just give a new value to the
 300
 
 ```
+
+# Predefined convertors and validators
+
+There are some convertors and validators already predefined in combined_options module.
+
+**Validators**
+
+`validate_in` — factory that returns a validator which checks if specified value is in the list.
+
+To use this validator, first get one from the factory, supplying the list of correct values for option:
+
+```python
+>>> from foliant.preprocessors.utils.combined_options import validate_in
+>>> correct = ['spam', 'eggs', 'bacon']
+>>> validator = validate_in(correct)
+>>> options = Options({'dish': 'chicken'}, convertors={'dish': validator})
+Traceback (most recent call last):
+  ...
+foliant.preprocessors.utils.combined_options.ValidationError: Unsupported option value chicken. Should be oneof: ['spam', 'eggs', 'bacon']
+
+```
+
+**Convertors**
+
+`yaml_to_dict_convertor` — converts yaml-string to python dict. If value is a dict already — just returns it.
+
+`boolean_convertor` — converts strings and integers into Boolean according to the table
+
+value | result
+----- | ------
+`1` | `True`
+`0` | `False`
+`'1'` | `True`
+`'0'` | `False`
+`'y'` | `True`
+`'n'` | `False`
+`'yes'` | `True`
+`'no'` | `False`
+`'true'` | `True`
+`'false'` | `False`
+`<other>` | `True`

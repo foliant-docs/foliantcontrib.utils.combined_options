@@ -168,7 +168,7 @@ def validate_in(supported, msg=None):
 
     Returns a validator function.'''
 
-    DEFAULT_MSG = 'Unsupported option value {val}. Should be one'\
+    DEFAULT_MSG = 'Unsupported option value {val}. Should be one '\
                   'of: {supported}'
 
     def validate(val):
@@ -200,6 +200,8 @@ def boolean_convertor(option):
     "other str" = True
     '''
     str_dict = {
+        '1': True,
+        '0': False,
         'y': True,
         'n': False,
         'yes': True,
