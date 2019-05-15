@@ -84,6 +84,9 @@ class Options:
     def __contains__(self, ind: str):
         return ind in self.options
 
+    def __iter__(self):
+        return iter(self.options.keys())
+
     def get(self, key, default=None):
         return self.options.get(key, default)
 
@@ -173,7 +176,7 @@ def validate_in(supported, msg=None):
 
     def validate(val):
         if val not in supported:
-            raise ValidationError(message.format(val=val, supported=supported))
+            raise ValidationError(message.format(val=val, supported=', '.join(supported)))
 
     if not hasattr(supported, '__contains__'):
         raise ValueError('`supported` should be a collection')

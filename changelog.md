@@ -1,4 +1,8 @@
-# 1.0.1
+# 1.0.3
+
+- add __iter__ method to allow `for param in options`
+
+# 1.0.2
 
 - add '0'\'1' to bool_convertor
 
