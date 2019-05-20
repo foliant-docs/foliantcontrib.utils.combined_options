@@ -1,4 +1,5 @@
 import yaml
+from pathlib import Path, PosixPath
 
 
 class ValidationError(Exception):
@@ -184,6 +185,14 @@ def validate_in(supported, msg=None):
     message = msg if msg else DEFAULT_MSG
 
     return validate
+
+
+def path_convertor(option: str or PosixPath):
+    '''convert string to Path'''
+    if type(option) is str:
+        return Path(yaml.load(option))
+    else:
+        return option
 
 
 def yaml_to_dict_convertor(option: str or dict):
