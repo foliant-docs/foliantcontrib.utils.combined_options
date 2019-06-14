@@ -190,7 +190,7 @@ def validate_in(supported, msg=None):
 def path_convertor(option: str or PosixPath):
     '''convert string to Path'''
     if type(option) is str:
-        return Path(yaml.load(option))
+        return Path(yaml.load(option, yaml.Loader))
     else:
         return option
 
@@ -201,7 +201,7 @@ def yaml_to_dict_convertor(option: str or dict):
     if type(option) is dict:
         return option
     elif type(option) is str:
-        return yaml.load(option)
+        return yaml.load(option, yaml.Loader)
 
 
 def boolean_convertor(option):

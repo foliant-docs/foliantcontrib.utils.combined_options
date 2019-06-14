@@ -1,3 +1,7 @@
+# 1.0.5
+
+- support PyYAML 5.1
+
 # 1.0.4
 
 - Add path_convertor which converts string options to pathlib.PosixPath
