@@ -1,3 +1,6 @@
+![](https://img.shields.io/pypi/v/foliantcontrib.utils.combined_options.svg)
+
+
 # Overview
 
 combined_options is a module which helps you cope with the options from foliant.yml and tag options.
@@ -40,6 +43,7 @@ Options class wraps around the options dictionary, for example from your foliant
 - `defaults` (dict, optional) — dictionary with default values, usually declared at the top of the preprocessor class.
 - `convertors` (dict, optional) — dictionary with key = option name, value = convertor function which will be applied to the value of an option with such name before storing in class.
 - `validators` (dict, optional) — dictionary with key = option name, value = validator function which will be applied to the value of this option. Function should check for validity and raise ValidationError if the check fails.
+- `required` (list, optional) — a list of required parameters or a list of combinations of required parameters.
 
 Let's say you have such options in your config:
 
@@ -164,6 +168,31 @@ So now let's attach our convertor to an option object:
 
 ```
 
+**Required options**
+
+Options class may check if all of the required options are defined. To use this feature supply a list of required param names in the `required` key:
+
+```python
+>>> config_options = {'title': 'My article', 'id': 335}
+>>> options = Options(config_options, required=['title', 'space'])
+Traceback (most recent call last):
+  ...
+foliant.preprocessors.utils.combined_options.RequiredParamsMissingError: Not all required params are supplied: ['title', 'space']
+
+```
+
+We've forgot to define the required parameter `space` and Options object alerted us right away.
+
+There are situations when you have not just required parameters but combination of required parameters. For example you can define the page you are editing by id, or by title and space. Both ways are possible, but one of them has to be satisfied.
+
+In this case you can supply a list with all possible combination in the `required` key like this:
+
+```python
+>>> config_options = {'title': 'My article', 'id': 335}
+>>> options = Options(config_options, required=[['title', 'space'], ['id']])
+
+```
+
 ## CombinedOptions class
 
 CombinedOptions is designed to merge several options dictionaries into one object. It is a common task when you have some global options set in foliant.yml but they can be overriden by tag options in Markdown source. The result is a dictionary-like CombinedOptions object which has all options from config and from the tag. Which option to use if they overlap is described by `priority` parameter.
@@ -239,7 +268,7 @@ To use this validator, first get one from the factory, supplying the list of cor
 >>> options = Options({'dish': 'chicken'}, convertors={'dish': validator})
 Traceback (most recent call last):
   ...
-foliant.preprocessors.utils.combined_options.ValidationError: Unsupported option value chicken. Should be one of: ['spam', 'eggs', 'bacon']
+foliant.preprocessors.utils.combined_options.ValidationError: Unsupported option value chicken. Should be one of: spam, eggs, bacon
 
 ```
 

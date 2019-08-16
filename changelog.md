@@ -1,3 +1,9 @@
+# 1.0.6
+
+- Add check for required params.
+- Add val_type validator to check for param types.
+- Allow to set values in Options objects
+
 # 1.0.5
 
 - support PyYAML 5.1

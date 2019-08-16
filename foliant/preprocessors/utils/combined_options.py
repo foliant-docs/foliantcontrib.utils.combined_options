@@ -7,6 +7,11 @@ class ValidationError(Exception):
     pass
 
 
+class RequiredParamsMissingError(Exception):
+    '''Error for required params checking when requirement is not satisfied'''
+    pass
+
+
 class Options:
     '''
     Helper class which imitates dictionary with options but has some
@@ -17,7 +22,8 @@ class Options:
                  options: dict,
                  defaults: dict = {},
                  convertors: dict = {},
-                 validators: dict = {}):
+                 validators: dict = {},
+                 required: list = []):
         '''
         options (dict)    — options dictionary,
         defaults (dict)   — dictionary with default values (needed only for
@@ -29,11 +35,14 @@ class Options:
                             which will be applied to the value of this option.
                             Function should check for validity and raise
                             ValidationError if the check fails.
+        required (list)   - list of required params or list of tuples with
+                            combinations of required params.
         '''
         self.defaults = defaults
         self._options = options
         self._validators = validators
         self._convertors = convertors
+        self._required = required
         self.validate()
         self._convert()
 
@@ -44,11 +53,16 @@ class Options:
 
     def validate(self):
         '''
-        Validate all options with supplied validators.
-        Raises ValidationError if any of checks fails.
+        Validate all options with supplied validators and check for required
+        params.
+        Raises ValidationError if any of validation checks fails.
+        Raises RequiredParamsMissingError if required params are not supplied.
         '''
-        if not self._validators:
-            return
+        def _check_required(combination) -> bool:
+            for param in combination:
+                if param not in self.options:
+                    return False
+            return True
 
         for key in self._validators:
             if key in self.options:
@@ -56,6 +70,19 @@ class Options:
                     self._validators[key](self.options[key])
                 except ValidationError as e:
                     raise ValidationError(f'Error in option "{key}": {e}')
+        if self._required:
+            if isinstance(self._required[0], str):
+                if not _check_required(self._required):
+                    raise RequiredParamsMissingError(
+                        f'Not all required params are supplied: {self._required}')
+            else:  # several combinations of required params are possible
+                check_result = any(_check_required(comb) for comb in self._required)
+                if not check_result:
+                    required_combs = "\nor:\n".\
+                        join(str(comb).strip('()[]') for comb in self._required)
+                    raise RequiredParamsMissingError(
+                        f'Not all required params are supplied. '
+                        f'Required parameter combinations are:\n{required_combs}')
 
     def _convert(self):
         '''
@@ -81,6 +108,10 @@ class Options:
 
     def __getitem__(self, ind: str):
         return self.options[ind]
+
+    def __setitem__(self, ind: str, val):
+        self.options[ind] = val
+        self.validate()
 
     def __contains__(self, ind: str):
         return ind in self.options
@@ -113,7 +144,8 @@ class CombinedOptions(Options):
                  priority: str = None,
                  defaults: dict = {},
                  convertors: dict = {},
-                 validators: dict = {}):
+                 validators: dict = {},
+                 required: list = []):
         '''
         options (dict) — dictionary where key = priority,
                          value = option dictionary.
@@ -124,6 +156,7 @@ class CombinedOptions(Options):
         self._options_dict = options
         self._validators = validators
         self._convertors = convertors
+        self._required = required
         self.defaults = defaults
         self.priority = priority or next(iter(options.keys()))
 
@@ -184,6 +217,29 @@ def validate_in(supported, msg=None):
 
     message = msg if msg else DEFAULT_MSG
 
+    return validate
+
+
+def val_type(supported: list or type):
+    '''
+    Validator factory for validating param type.
+
+    `supported` may be a type to check or a list (tuple) of possible types.
+    '''
+
+    MSG = 'Unsupported option value {val}. Must be of type {supported}'
+
+    def validate(val):
+        for type_ in types:
+            if isinstance(val, type_):
+                return
+        raise ValidationError(MSG.format(val=val, supported=', '.join(str(t) for t in types)))
+    if isinstance(supported, type):
+        types = [supported]
+    elif hasattr(supported, '__contains__'):
+        types = supported
+    else:
+        raise ValueError('`supported` should be a type or a collection of types')
     return validate
 
 
