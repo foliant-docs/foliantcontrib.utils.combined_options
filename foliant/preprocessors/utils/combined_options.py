@@ -243,6 +243,13 @@ def val_type(supported: list or type):
     return validate
 
 
+def validate_exists(val):
+    '''Validator that checks if path specified in val exists'''
+    MSG = 'Path {val} does not exist.'
+    if val and not Path(str).exists():
+        raise ValidationError(MSG.format(val=val))
+
+
 def path_convertor(option: str or PosixPath):
     '''convert string to Path'''
     if type(option) is str:
@@ -283,3 +290,18 @@ def boolean_convertor(option):
         return bool(int)
     elif type(option) == str:
         return str_dict.get(option.lower().strip(), True)
+
+
+def rel_path_convertor(parent_path: str or PosixPath):
+    '''
+    Convertor factory which makes option path relative to parent_path supplied
+    durint the convertor initialization.
+    '''
+
+    def _convertor(option):
+        if not option:
+            return option
+        else:
+            return Path(parent_path) / option
+
+    return _convertor

@@ -1,3 +1,8 @@
+# 1.0.7
+
+- Add `validate_exists` validator.
+- Add `rel_path_convertor`.
+
 # 1.0.6
 
 - Add check for required params.
