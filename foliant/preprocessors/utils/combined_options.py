@@ -246,7 +246,7 @@ def val_type(supported: list or type):
 def validate_exists(val):
     '''Validator that checks if path specified in val exists'''
     MSG = 'Path {val} does not exist.'
-    if val and not Path(str).exists():
+    if val and not Path(val).exists():
         raise ValidationError(MSG.format(val=val))
 
 

@@ -1,3 +1,7 @@
+# 1.0.8
+
+- Fix `validate_exists` validator.
+
 # 1.0.7
 
 - Add `validate_exists` validator.
