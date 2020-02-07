@@ -1,3 +1,8 @@
+# 1.0.9
+
+- defaults now actually supply default value (before they were only used for validation)
+- add None to possible type validation in `val_type`.
+
 # 1.0.8
 
 - Fix `validate_exists` validator.

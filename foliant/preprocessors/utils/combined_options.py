@@ -26,8 +26,7 @@ class Options:
                  required: list = []):
         '''
         options (dict)    — options dictionary,
-        defaults (dict)   — dictionary with default values (needed only for
-                            is_default to work),
+        defaults (dict)   — dictionary with default values,
         convertors (dict) — dictionary with key = option name, value = function
                             which will be applied to the value of this option
                             before storing in class.
@@ -39,7 +38,7 @@ class Options:
                             combinations of required params.
         '''
         self.defaults = defaults
-        self._options = options
+        self._options = {**defaults, **options}
         self._validators = validators
         self._convertors = convertors
         self._required = required
@@ -181,7 +180,7 @@ class CombinedOptions(Options):
         dicts with priority according to self.priority.
         '''
 
-        self._options = {}
+        self._options = self.defaults
         priority_dict = self._options_dict[self.priority]
 
         for key in self._options_dict:
@@ -224,22 +223,27 @@ def val_type(supported: list or type):
     '''
     Validator factory for validating param type.
 
-    `supported` may be a type to check or a list (tuple) of possible types.
+    `supported` may be a type to check, None or a list (tuple) of possible types.
     '''
 
     MSG = 'Unsupported option value {val}. Must be of type {supported}'
 
     def validate(val):
         for type_ in types:
-            if isinstance(val, type_):
+            if type_ is None:
+                if val is None:
+                    return
+            elif isinstance(val, type_):
                 return
         raise ValidationError(MSG.format(val=val, supported=', '.join(str(t) for t in types)))
-    if isinstance(supported, type):
+    if supported is None:
+        types = [None]
+    elif isinstance(supported, type):
         types = [supported]
     elif hasattr(supported, '__contains__'):
         types = supported
     else:
-        raise ValueError('`supported` should be a type or a collection of types')
+        raise ValueError('`supported` should be a type, None or a collection of types')
     return validate
 
 
@@ -295,7 +299,7 @@ def boolean_convertor(option):
 def rel_path_convertor(parent_path: str or PosixPath):
     '''
     Convertor factory which makes option path relative to parent_path supplied
-    durint the convertor initialization.
+    during the convertor initialization.
     '''
 
     def _convertor(option):

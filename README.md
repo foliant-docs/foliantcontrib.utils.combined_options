@@ -1,5 +1,4 @@
-![](https://img.shields.io/pypi/v/foliantcontrib.utils.combined_options.svg)
-
+[![](https://img.shields.io/pypi/v/foliantcontrib.utils.combined_options.svg)](https://pypi.org/project/foliantcontrib.utils.combined-options/)
 
 # Overview
 
@@ -265,16 +264,59 @@ To use this validator, first get one from the factory, supplying the list of cor
 >>> from foliant.preprocessors.utils.combined_options import validate_in
 >>> correct = ['spam', 'eggs', 'bacon']
 >>> validator = validate_in(correct)
->>> options = Options({'dish': 'chicken'}, convertors={'dish': validator})
+>>> options = Options({'dish': 'chicken'}, validators={'dish': validator})
 Traceback (most recent call last):
   ...
-foliant.preprocessors.utils.combined_options.ValidationError: Unsupported option value chicken. Should be one of: spam, eggs, bacon
+foliant.preprocessors.utils.combined_options.ValidationError: Error in option "dish": Unsupported option value chicken. Should be one of: spam, eggs, bacon
+
+```
+
+***
+
+`val_type` — factory that returns validator, which checks if specified value is of correct type.
+
+```python
+>>> from foliant.preprocessors.utils.combined_options import val_type
+>>> validator = val_type(str)
+>>> options = Options({'name': 998}, validators={'name': validator})
+Traceback (most recent call last):
+  ...
+foliant.preprocessors.utils.combined_options.ValidationError: Error in option "name": Unsupported option value 998. Must be of type <class 'str'>
+
+```
+
+You can also specify a list of supported types:
+
+```python
+>>> correct = [str, int, None]
+>>> validator = val_type(correct)
+>>> options = Options({'name': None}, validators={'name': validator})
+>>> options = Options({'name': ['Bob', 'Alice']}, validators={'name': validator})
+Traceback (most recent call last):
+  ...
+foliant.preprocessors.utils.combined_options.ValidationError: Error in option "name": Unsupported option value ['Bob', 'Alice']. Must be of type <class 'str'>, <class 'int'>, None
+
+```
+
+***
+
+`validate_exists` — checks if specified path exists in file system.
+
+```python
+>>> from foliant.preprocessors.utils.combined_options import validate_exists
+>>> options = Options({'fp': '/'}, validators={'fp': validate_exists})
+>>> options = Options({'fp': '/wrong'}, validators={'fp': validate_exists})
+Traceback (most recent call last):
+  ...
+foliant.preprocessors.utils.combined_options.ValidationError: Error in option "fp": Path /wrong does not exist.
 
 ```
 
 **Convertors**
 
-`yaml_to_dict_convertor` — converts yaml-string to python dict. If value is a dict already — just returns it.
+`yaml_to_dict_convertor` — converts yaml-string to python dict. If value is a dict already — just returns it. **DEPRECATED:** since Foliant 1.0.9 all tag option values are treated as YAML.
+
+***
 
 `boolean_convertor` — converts strings and integers into Boolean according to the table
 
@@ -291,3 +333,16 @@ value | result
 `'true'` | `True`
 `'false'` | `False`
 `<other>` | `True`
+
+***
+
+`rel_path_convertor` —  Convertor factory which makes path, supplied in option value, relative to parent_path, set during the convertor initialization. Returns `PosixPath` object.
+
+```python
+>>> from foliant.preprocessors.utils.combined_options import rel_path_convertor
+>>> my_conv = rel_path_convertor('/usr/src/app')
+>>> options = Options({'index': 'src/index.md'}, convertors={'index': my_conv})
+>>> options['index']
+PosixPath('/usr/src/app/src/index.md')
+
+```
