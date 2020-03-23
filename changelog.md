@@ -1,3 +1,9 @@
+# 1.0.10
+
+- Fix: default dict was overriden after the first use.
+- Allow to supply the list of priorities instead of just one priority.
+- Priority for those option dictionaries, which are not mentioned in the `priority` param, are now defined by the order dictionaries are defined.
+
 # 1.0.9
 
 - defaults now actually supply default value (before they were only used for validation)

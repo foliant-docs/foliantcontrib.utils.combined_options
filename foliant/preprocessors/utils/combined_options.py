@@ -1,5 +1,7 @@
 import yaml
 from pathlib import Path, PosixPath
+from copy import deepcopy
+from collections import OrderedDict
 
 
 class ValidationError(Exception):
@@ -134,22 +136,24 @@ class Options:
 class CombinedOptions(Options):
     '''
     Helper class which combines several Options objects into one. If options
-    interlap the one to be returned is defined by 'priority'.
+    interlap the one to be returned is defined by 'priority' or by the order
+    defined.
+
     Apart from that it is a normal Options object.
     '''
 
     def __init__(self,
-                 options: dict,
-                 priority: str = None,
+                 options: dict or OrderedDict,
+                 priority: str or list = None,
                  defaults: dict = {},
                  convertors: dict = {},
                  validators: dict = {},
                  required: list = []):
         '''
-        options (dict) — dictionary where key = priority,
+        :param options:  dictionary where key = priority,
                          value = option dictionary.
-        priority (str) — initial priority (if not set = first key from
-                         options dict).
+        :param priority: initial priority  or list of prioritites.
+
         other parameters are same as in parent
         '''
         self._options_dict = options
@@ -157,7 +161,7 @@ class CombinedOptions(Options):
         self._convertors = convertors
         self._required = required
         self.defaults = defaults
-        self.priority = priority or next(iter(options.keys()))
+        self.priority = priority
 
     @property
     def priority(self):
@@ -167,11 +171,19 @@ class CombinedOptions(Options):
     @priority.setter
     def priority(self, val: str):
         '''sets new priority and updates active options dictionary'''
-        if val not in self._options_dict:
-            raise ValueError('Priority must be one of: '
-                             f'{", ".join(self._options_dict.keys())}. '
-                             f'Value received: {val}')
-        self._priority = val
+        if isinstance(val, (list, tuple)):
+            priority_list = val
+        elif isinstance(val, str):
+            priority_list = [val]
+        else:
+            priority_list = []
+
+        for p in priority_list:
+            if p not in self._options_dict:
+                raise ValueError('Priority must be one of: '
+                                 f'{", ".join(self._options_dict.keys())}. '
+                                 f'Value received: {p}')
+        self._priority = priority_list
         self.set_options()
 
     def set_options(self):
@@ -180,13 +192,14 @@ class CombinedOptions(Options):
         dicts with priority according to self.priority.
         '''
 
-        self._options = self.defaults
-        priority_dict = self._options_dict[self.priority]
+        self._options = deepcopy(self.defaults)
 
-        for key in self._options_dict:
-            if key != self.priority:
+        for key in reversed(list(self._options_dict)):
+            if key not in self.priority:
                 self._options.update(self._options_dict[key])
-        self._options.update(priority_dict)
+
+        for priority in reversed(self.priority):
+            self._options.update(self._options_dict[priority])
 
         self.validate()
         self._convert()

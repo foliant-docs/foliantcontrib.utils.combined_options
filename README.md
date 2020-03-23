@@ -194,7 +194,9 @@ In this case you can supply a list with all possible combination in the `require
 
 ## CombinedOptions class
 
-CombinedOptions is designed to merge several options dictionaries into one object. It is a common task when you have some global options set in foliant.yml but they can be overriden by tag options in Markdown source. The result is a dictionary-like CombinedOptions object which has all options from config and from the tag. Which option to use if they overlap is described by `priority` parameter.
+CombinedOptions is designed to merge several options dictionaries into one object. It is a common task when you have some global options set in foliant.yml but they can be overriden by tag options in Markdown source. The result is a dictionary-like CombinedOptions object which has all options from config and from the tag.
+
+When options overlap, the priority would be given to the option from the dictionary, which defined it first. If you want to override this behavior (or make things more verbose) you can utilize the `priority` parameter.
 
 CombinedOptions is inherited from Options class and repeats all its functionality.
 
@@ -217,17 +219,15 @@ To illustrate CombinedOptions' handiness let's assume that you have two option d
 
 ```
 
-Let's combine these two options in one object. To do this we will have to pack them into a single dictionary under arbitrary keys, and supply a priority string which should be one of aforementioned keys:
+Let's combine these two options in one object. To do this we will have to pack them into a single dictionary under arbitrary keys (keys are explained later):
 
 ```python
 >>> from foliant.preprocessors.utils.combined_options import CombinedOptions
->>> options = CombinedOptions({'config': config_options, 'tag': tag_options}, priority='tag')
+>>> options = CombinedOptions({'tag': tag_options, 'config': config_options})
 
 ```
 
-Note that we've given tag_options a priority by supplying parameter `priority='tag'`
-
-Now look at the values we are getting:
+As you have noticed, we have parameter `'dpi'` defined in both option dictionaries. Let's look at the values we will be getting:
 
 ```python
 >>> options['config']  # we have option from config_options
@@ -239,14 +239,24 @@ Now look at the values we are getting:
 
 ```
 
-Of course, CombinedOptions supports validation and convertors just as the Options class does.
+In the CombinedOptions object we have options from both `config` and `tag` dictionaries. The conflicting options (like `dpi` in our example) are picked from the first dictionary defined. (If you are using Python 3.5 and older, supply options in `OrderedDict`)
+
+If you wish to change the priority of the dictionaries (or make it more verbose), use the `priority` parameter, which may be a single string, o list of strings in priority order:
+
+```python
+>>> options = CombinedOptions({'tag': tag_options, 'config': config_options}, priority='config')
+>>> options['dpi']  # now we should get the value from 'config' dictionary
+300
+
+```
+
 
 You can also change the priority on fly. To do this just give a new value to the `priority` attribute:
 
 ```python
->>> options.priority = 'config'
+>>> options.priority = 'tag'
 >>> options['dpi']
-300
+500
 
 ```
 
