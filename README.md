@@ -1,5 +1,7 @@
 [![](https://img.shields.io/pypi/v/foliantcontrib.utils.combined_options.svg)](https://pypi.org/project/foliantcontrib.utils.combined-options/) [![](https://img.shields.io/github/v/tag/foliant-docs/foliantcontrib.utils.combined_options.svg?label=GitHub)](https://github.com/foliant-docs/foliantcontrib.utils.combined_options)
 
+**This package is deprecated and will be removed in future. Combined options moved to the [main utils package](https://github.com/foliant-docs/foliantcontrib.utils).
+
 # Overview
 
 combined_options is a module which helps you cope with the options from foliant.yml and tag options.
